@@ -3,6 +3,7 @@ import RelatedProducts from "../components/RelatedProducts";
 import { useParams } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { ShopContext } from "../context/ShopContext";
+import QRCode from 'react-qr-code';
 
 const Product = () => {
   const {productId} = useParams();
@@ -22,6 +23,8 @@ const Product = () => {
       }
     })
   }
+
+
     useEffect(()=>{
       fetchProductData();
     },[productId])
@@ -56,6 +59,10 @@ const Product = () => {
             <img src={assets.star_dull_icon} alt="" className="w-3 5" />
             <p className='pl-2'>(122)</p>
             </div>
+              <div className="p-4">
+                <h2 className=" font-semibold mb-2">Scan to Compare Product</h2>
+                <QRCode value={`${window.location.origin}/compare/${productId}`} size={120} />
+              </div>
             <p className='mt-5 text-3xl font-medium'>{currency}{productData.price}</p>
             <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p>
             <div className='flex flex-col gap-4 my-8'>

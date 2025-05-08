@@ -1,5 +1,11 @@
 import productModel from "../models/productModel.js";
 import { v2 as cloudinary } from "cloudinary";
+import axios from "axios";
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const cheerio = require('cheerio');
+
+
 
  // function for add product
 const addProduct = async (req,res) => {
@@ -85,7 +91,29 @@ const singleProduct = async (req,res) => {
   }
 }
 
+const compareProduct = async (req,res) => {
+    const { query } = req.query;
+    const url = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
+  
+    try {
+      const { data } = await axios.get(url, {
+        headers: { "User-Agent": "Mozilla/5.0" }
+      });
+  
+      const $ = cheerio.load(data);
+      const firstProduct = $('._75nlfW').first();
 
-export {listProducts , addProduct , singleProduct , removeProduct}
+      const name = firstProduct.find('.wjcEIp').first().text();
+      const price = firstProduct.find('.Nx9bqj').first().text();
+      
+      res.json({ name, price });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to scrape Flipkart" });
+    }
+}
+
+
+export {listProducts , addProduct , singleProduct , removeProduct, compareProduct}
 
 

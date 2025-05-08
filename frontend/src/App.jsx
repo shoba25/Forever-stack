@@ -1,6 +1,7 @@
 import "react-toastify/dist/ReactToastify.css";
 import About from "./pages/About";
 import Cart from "./pages/Cart";
+import Compare from "./components/Compare";
 import Collection from "./pages/Collection";
 import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
@@ -14,7 +15,7 @@ import React from "react";
 import SearchBar from "./components/SearchBar";
 import Verify from "./pages/Verify";
 import { Route, Routes } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
       <SearchBar />
       <Routes>
         <Route path='/'  element={<Home/>} />
+        <Route path='/compare/:productId' element={<Compare/>} />
         <Route path='/collection' element={<Collection/>} />
         <Route path='/about' element={<About/>} />
         <Route path='/contact' element={<Contact/>} />
