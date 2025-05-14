@@ -98,9 +98,13 @@ const compareProduct = async (req, res) => {
   const searchUrl = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
 
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+    const browser = await puppeteer.launch({
+      headless: true,
+      executablePath: '/usr/bin/google-chrome', // or wherever Chrome is installed
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
 
+    const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0');
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
@@ -115,7 +119,7 @@ const compareProduct = async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to scrape Flipkart (Blocked or rate-limited)' });
+    res.status(500).json({ error: 'Failed to scrape Flipkart with Puppeteer' });
   }
 };
 
