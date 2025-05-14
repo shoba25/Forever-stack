@@ -95,7 +95,7 @@ const singleProduct = async (req,res) => {
 const compareProduct = async (req, res) => {
   const { query } = req.query;
   const url = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
-  const scraperUrl = `http://api.scraperapi.com?api_key=48ac6bbf0dcaa5fd8e52dd64e6f736a4&url=${encodeURIComponent(targetUrl)}`;
+  const scraperUrl = `http://api.scraperapi.com?api_key=48ac6bbf0dcaa5fd8e52dd64e6f736a4&url=${encodeURIComponent(url)}`;
 
   try {
     const response = await fetch(scraperUrl);
