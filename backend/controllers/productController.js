@@ -120,7 +120,7 @@ const compareProduct = async (req, res) => {
     res.json({ name, price });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to scrape Flipkart' });
+    res.status(500).json({ err,error: 'Failed to scrape Flipkart' });
   }
 };
 
