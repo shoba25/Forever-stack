@@ -95,16 +95,10 @@ const singleProduct = async (req,res) => {
 const compareProduct = async (req, res) => {
   const { query } = req.query;
   const url = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
+  const scraperUrl = `http://api.scraperapi.com?api_key=48ac6bbf0dcaa5fd8e52dd64e6f736a4&url=${encodeURIComponent(targetUrl)}`;
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-  'Accept-Language': 'en-US,en;q=0.9',
-  'Accept': 'text/html,application/xhtml+xml',
-  'Referer': 'https://www.google.com/',
-      }
-    });
+    const response = await fetch(scraperUrl);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
