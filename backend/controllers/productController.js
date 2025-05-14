@@ -5,6 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const cheerio = require('cheerio');
 import fetch from 'node-fetch';
+const puppeteer = require('puppeteer');
 
 
 
@@ -94,33 +95,27 @@ const singleProduct = async (req,res) => {
 
 const compareProduct = async (req, res) => {
   const { query } = req.query;
-  const url = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
+  const searchUrl = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-  'Accept-Language': 'en-US,en;q=0.9',
-  'Accept': 'text/html,application/xhtml+xml',
-  'Referer': 'https://www.google.com/',
-      }
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+
+    await page.setUserAgent('Mozilla/5.0');
+    await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+    const result = await page.evaluate(() => {
+      const firstProduct = document.querySelector('._75nlfW');
+      const name = firstProduct?.querySelector('.wjcEIp')?.innerText || 'Name not found';
+      const price = firstProduct?.querySelector('.Nx9bqj')?.innerText || 'Price not found';
+      return { name, price };
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.text();
-    const $ = cheerio.load(data);
-    const firstProduct = $('._75nlfW').first();
-
-    const name = firstProduct.find('.wjcEIp').first().text();
-    const price = firstProduct.find('.Nx9bqj').first().text();
-
-    res.json({ name, price });
+    await browser.close();
+    res.json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to scrape Flipkart' });
+    res.status(500).json({ error: 'Failed to scrape Flipkart (Blocked or rate-limited)' });
   }
 };
 
