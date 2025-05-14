@@ -4,6 +4,7 @@ import axios from "axios";
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const cheerio = require('cheerio');
+import fetch from 'node-fetch';
 
 
 
@@ -91,27 +92,34 @@ const singleProduct = async (req,res) => {
   }
 }
 
-const compareProduct = async (req,res) => {
-    const { query } = req.query;
-    const url = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
-  
-    try {
-      const { data } = await axios.get(url, {
-        headers: { "User-Agent": "Mozilla/5.0" }
-      });
-  
-      const $ = cheerio.load(data);
-      const firstProduct = $('._75nlfW').first();
+const compareProduct = async (req, res) => {
+  const { query } = req.query;
+  const url = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
 
-      const name = firstProduct.find('.wjcEIp').first().text();
-      const price = firstProduct.find('.Nx9bqj').first().text();
-      
-      res.json({ name, price });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to scrape Flipkart" });
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-}
+
+    const data = await response.text();
+    const $ = cheerio.load(data);
+    const firstProduct = $('._75nlfW').first();
+
+    const name = firstProduct.find('.wjcEIp').first().text();
+    const price = firstProduct.find('.Nx9bqj').first().text();
+
+    res.json({ name, price });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to scrape Flipkart' });
+  }
+};
 
 
 export {listProducts , addProduct , singleProduct , removeProduct, compareProduct}
